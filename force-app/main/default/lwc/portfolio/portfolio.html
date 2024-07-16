@@ -1,0 +1,180 @@
+<template>
+    <lightning-card  title="Portfolio">
+        <lightning-button label="Portfolio" onclick={handleMyPortfolio}  slot="actions"></lightning-button>
+        <template lwc:if={toggle}>
+        <!-- <lightning-button label="Create Portfolio" onclick={handleCreatePortfolio}  slot="actions"></lightning-button> -->
+        
+               
+
+        <div class="container slds-grid slds-wrap">
+            <div class="side_bar slds-col slds-size_1-of-2 slds-medium-size_6-of-12 slds-large-size_3-of-12">
+                <div class="side_header_container slds-grid">
+                     <h2 class="side_bar_title slds-var-p-around_x-small slds-col">My Portfolio</h2>
+                     <template lwc:if={portfolios.length}>
+                         <lightning-button-icon class=" slds-p-top_small slds-p-left_large slds-col" icon-name="utility:add" onclick={handleCreatePortfolio}></lightning-button-icon>
+                    </template>
+                    <!-- <p class="aside_button_add_text">Add Transaction</p>    -->
+                 </div>
+                     <template lwc:if={portfolios.length}>
+                        <lightning-layout class="slds-grid_vertical slds-scrollable_y side_bar_container">
+                            <template for:each={portfolios} for:item="portfolio">
+                                
+                                
+                                <lightning-layout-item label={portfolio.Portfolio_Name__c} key={portfolio.Id} class="portfolio_item side_bar_item" onclick={handleSelectPortfolio} data-id={portfolio.Id}>
+                                    <div class="portfolio_content">
+
+                                        <span calss="portfolio_title">{portfolio.Portfolio_Name__c}</span>
+                    
+                                        <div class="portfolio_threedots_button hidden">
+                                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                               
+                                                <button
+                                                    class="slds-button slds-button_icon  slds-button_icon-inverse"
+                                                    aria-haspopup="true"
+                                                    type="button"
+                                                   >
+                                                    <svg class="slds-button__icon slds-button__icon_large  custom_button_active" >
+                                                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#threedots"></use>
+                                                    </svg>
+                                                    <span class="slds-assistive-text">Remove and Rename</span>
+                                                </button>
+                                                
+                                                <div class=" slds-dropdown slds-dropdown_left slds-dropdown_small hidden">
+                                                    <ul class="slds-dropdown__list" role="menu">
+                                                      <li class="slds-dropdown__item" role="presentation">
+                                                        <button role="menuitem" >
+                                                          <span class="slds-truncate" title="Rename" onclick={handleRename}>Rename</span>
+                                                          </svg>
+                                                        </button>
+                                                      </li>
+                                                      <li class="slds-dropdown__item" role="presentation">
+                                                        <button role="menuitem" >
+                                                          <span class="slds-truncate" title="Remove" onclick={handleRemove}>Remove</span>
+                                                          </svg>
+                                                        </button>
+                                                      </li>
+                                                    </ul>
+                                                  </div>
+                                                </div>
+
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    <!-- <lightning-button-icon    class="portfolio_threedots_button slds-p-around_xx-small hidden" icon-name="utility:threedots" onclick={handleThreedotsItems}></lightning-button-icon> -->
+                                </lightning-layout-item>
+                            </template>
+                      </lightning-layout>
+                    </template>
+
+                    <template lwc:else>
+                        <div class="side_bar_container_button">
+                            <div class="wrapper_side_bar_button">
+                                <div class="side_button_container">
+                                    <lightning-button-icon class="side_button_add_portfolio slds-var-p-around_x-small" icon-name="utility:add" onclick={handleCreatePortfolio}></lightning-button-icon>
+                                    <p class="side_button_add_text">Add Portfolio</p>       
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+            </div>
+
+            <div class="aside slds-col slds-size_2-of-2 slds-medium-size_6-of-12 slds-large-size_9-of-12" >
+                <div class="aside_header">
+                    <template lwc:if={selectedPortfolio.Portfolio_Name__c}>
+                        <div class="aside_header_container slds-grid">
+                            <h2 class="aside_title slds-var-p-around_x-small slds-col">{selectedPortfolio.Portfolio_Name__c}</h2>
+                            <div class="aside_context slds-var-p-around_x-small slds-col">
+                                <div class="aside_context_container">
+                                    Profit/Loss: 
+                                    <div class="container_average_icon ">
+                                        <template lwc:if={isIconUp}>
+                                            <span class="custom-icon slds-icon_container slds-icon-utility-up "  title="Average UP or Down">
+                                                <svg class=" slds-icon slds-icon_x-small slds-m-bottom_small" aria-hidden="true">
+                                                    <use class="slds-icon" style= "fill:#32e462" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#up"></use>
+                                                </svg>
+                                                <span class="slds-assistive-text">Average UP or Down</span>    
+                                            </span>
+                                        </template>
+                                        <template lwc:if={isIconDown}>
+                                            <span class="custom-icon slds-icon_container slds-icon-utility-down "  title="Average UP or Down">
+                                                <svg class=" slds-icon slds-icon_x-small slds-m-top_x-small" aria-hidden="true">
+                                                    <use class="slds-icon" style= "fill:red" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#down"></use>
+                                                </svg>
+                                                <span class="slds-assistive-text">Average UP or Down</span>    
+                                            </span>
+                                        </template>
+
+                                    </div>
+                                    <p class="aside_context_average"  data-id="average">
+                                        ${averageProfitAndLoss}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>  
+
+                    <template lwc:else>
+                        <div class="aside_header_container">
+                            <h2 class="aside_title slds-var-p-around_x-small">Need to create a portfolio</h2>
+                        </div>
+                    </template>  
+                </div> 
+
+                <div class="aside_body">
+                    <template lwc:if={selectedPortfolio.Portfolio_Name__c}>
+
+                        <template lwc:if={dataTable.length}>
+
+                            <div class="aside_container ">    
+                                <lightning-datatable key-field="Id" 
+                                data={dataTable} 
+                                columns={columns} 
+                                hide-checkbox-column = "true" 
+                                show-row-number-column="true"
+                                onrowaction={handleRowAction}>
+                            </lightning-datatable>
+                            
+                            <div class="aside_footer slds-m-around_small ">
+                                <div class="slds-float_left">
+                                    <lightning-button class="aside_button_new-transaction"  label="New Transaction" icon-name="" variant="base" onclick={handleNewTransaction}></lightning-button>    
+                                </div>
+                                <template lwc:if={isPaginator}>
+                                    <div class="slds-float_right"></div>
+                                    <c-paginator onprevious={prevHandler} page-number={pageNumber} number-of-pages={numberOfPages} onnext={nextHandler}> </c-paginator>
+                                </template>    
+                             </div> 
+
+                        </div>
+                        </template>
+
+                        <template lwc:else>
+                            <div class="wrapper_aside_button">
+                                <div class="aside_button_container">
+                                    <lightning-button-icon class="aside_button_add slds-var-p-around_x-small" icon-name="utility:add" onclick={handleAddTransaction}></lightning-button-icon>
+                                    <p class="aside_button_add_text">Add Transaction</p>       
+                                </div>
+                            </div>
+                        </template>
+                        
+                    </template>
+
+                    <template lwc:else>
+                        <div class="wrapper_aside_button">
+                            <div class="aside_button_container">
+                                <lightning-button-icon class="aside_button_add slds-var-p-around_x-small" icon-name="utility:add" onclick={handleAddTransaction}></lightning-button-icon>
+                                <p class="aside_button_add_text">Add Transaction</p>       
+                            </div>
+                        </div>
+                    </template>
+                    
+
+
+                </div>
+            </div>
+        </div>
+
+    </template> 
+    </lightning-card>
+</template>

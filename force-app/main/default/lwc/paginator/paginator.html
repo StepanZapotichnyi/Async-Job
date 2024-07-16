@@ -1,0 +1,15 @@
+<template>
+    <lightning-layout>
+        <lightning-layout-item>
+            <lightning-button-icon label="" icon-name="utility:left" onclick={handelPrevious}></lightning-button-icon>
+        </lightning-layout-item>
+        <lightning-layout-item flexibility="grow">
+            <div class="slds-p-top_xx-small slds-m-horizontal_x-small">
+                <p class="">{pageNumber} of {numberOfPages}</p>
+            </div>
+        </lightning-layout-item>
+        <lightning-layout-item>
+            <lightning-button-icon label="" icon-name="utility:right" onclick={handleNext}></lightning-button-icon>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>
