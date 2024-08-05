@@ -28,88 +28,93 @@
     font-weight: bold;
 }
 
-.side_bar_item {
-    padding: 8px 16px;
-    transition: background-color 0.2s;
+ .side_bar_item {
     cursor: pointer; 
-}
-
-.side_bar_item:hover  {
-    background-color: #eff0f1; 
-    /* transition: 0.7s; */
-    border-left: 3px solid black;
-
-}
-.side_bar_item:active  {
-    background-color: #b0b2b3;
-    border-left: 3px solid black;
-
-}
-
-
-
-.portfolio_content{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-}
-.portfolio_title{
+    outline: none;
     
 }
+
+.container-content-item{
+    height: 48px;
+}
+
+.is-selected{
+    background-color: #eff0f1;
+    border-left: 3px solid black;
+}  
+
+.side_bar_item:hover {
+    background-color: #b4b9be; 
+}
+
+
+/* .side_bar_item:hover .custom_button_threedots {
+    background-color: #b4b9be; 
+} */
+
+
+.is-active:active {
+    background-color: #7b8286;
+}
+/* .custom_button_threedots:active {
+    color: aquamarine;
+    background-color: aqua; */
+/* } */
+
+/* .side_bar_item:active  {
+    background-color: #7b8286;
+} */
+
+.custom_button_active:hover{
+    fill: dimgray ;
+}
+
+.custom_button_active:active{
+    fill: darkmagenta;
+}
+
+.container_name_item{
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    
+
+}
+
 
 .portfolio_threedots_button{
     position: relative;
+    /* background-color: #b4b9be; */
+    /* opacity: 0; */
 }
 
+.custom_button_threedots{
+    border:none;
+    background-color: transparent; 
+ 
+   
+}   
 
 .portfolio_threedots_button.hidden{
     opacity: 0;
-    transition: opacity 0.3s ease;
-
+    background-color: #b4b9be;
 }
 
-
-
-
-.side_bar_item:hover .portfolio_threedots_button.hidden {
+.side_bar_item:hover .portfolio_threedots_button.hidden  {
     opacity: 1;
-}
+} 
 
-
-
-
-.custom_button_active{
-    color: black;
-}
-
-.custom_button_active:hover{
-    color:white;
-}
-
-
-.slds-dropdown.hidden{
-    opacity: 0;
-    transition: opacity 0.3s ease;
-
-}
-
-.portfolio_threedots_button:hover .slds-dropdown.hidden {
-    opacity: 1;
-    
-}
-
-.slds-dropdown{
-
+.custom_threedots_menu-buttons{
     position: absolute;
-}
-
+    z-index: 1000;  
+} 
 
 
 .side_bar_container_button{
     height: 360px; 
     width: 100%;
 }
+
 .wrapper_side_bar_button{
     height: 100%;
     display: flex;
@@ -161,11 +166,6 @@
     
     
 }
-/* 
-.aside_context_average_icon:hover{
-    --slds-c-icon-color-foreground: #32e462;
-
-} */
 
 .aside_body{
     background-color:#eff0f1;

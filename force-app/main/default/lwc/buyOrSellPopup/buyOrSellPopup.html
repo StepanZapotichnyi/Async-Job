@@ -1,0 +1,27 @@
+<template>
+    <div class="container_custom_modal">
+            <lightning-card variant="Narrow" title={transaction.type} icon-name="standard:notes">
+                <div class="custom_body_modal ">
+                    <div class="slds-m-around_medium">
+                        <p class="custom-paragraph">
+                            <span class="custom-span">Token: {transaction.name}</span>
+                        </p>
+                        <p class="custom-paragraph">
+                            <span class="custom-span">Your holdings: {transaction.holdings}</span>
+                        </p>
+                        <lightning-input type="number"  label="Quantity"  onchange={handleQuantityChange}  ></lightning-input>
+                    </div>
+                    <div class="slds-m-around_medium ">
+                        <p></p>
+                        <lightning-input type="number"  value={transaction.price}  label="Price" onchange={handlePriceChange}></lightning-input>
+                    </div>
+                </div>    
+                <!-- <lightning-modal-footer> --> 
+                <div class="custom_footer_modal">
+                        <lightning-button class="" label={transaction.type}  variant={transaction.variant} onclick={handleTransaction}></lightning-button>
+                </div>  
+                <!-- </lightning-modal-footer>  -->
+            </lightning-card>
+    </div>
+   
+</template>

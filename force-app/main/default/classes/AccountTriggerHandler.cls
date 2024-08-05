@@ -86,9 +86,9 @@ public with sharing class AccountTriggerHandler {
         HttpCallouts.HttpResponseWrapper response = HttpCallouts.executeHttpRequest(Utility.getCryptoEndpoint(currencySymbolMappings.get('RateSymbol')));
 
         if(response.statusCode >= 200 && response.statusCode < 300) {
-            
+            System.debug( 'Body=='+response.responseBody);
             PriceCrypto cryptoPrices = (PriceCrypto) JSON.deserialize(response.responseBody, PriceCrypto.class);
-            
+            System.debug('PR=='+cryptoPrices );
              if(cryptoPrices.Response != 'Error'){
                 
                 Decimal cryptoSymbolValue = Test.isRunningTest() ? 0.00222 :cryptoPrices.Data.get(currencySymbolMappings.get('CyptoSymbol'));

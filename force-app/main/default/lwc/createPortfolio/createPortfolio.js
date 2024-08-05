@@ -23,16 +23,6 @@ export default class CreatePortfolio extends LightningModal {
           }
 
           console.log(this.labelValue);
-          if(this.labelValue) {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Error',
-                    message: 'Name should not be longer than 20 sings',
-                    variant: 'error'
-                })
-            );
-            return;
-        }
   
   
            this.close({

@@ -1,0 +1,34 @@
+.container_custom_modal {
+    transform: translate(-50%, 0%);
+    position: relative;
+    left: 50%;
+    font-size: 16px;
+    margin: 25px;
+    width: 400px;
+    height: 400px;
+  
+  }
+  
+
+
+.custom_body_modal{
+    padding: 0 16px 16px 16px;
+  }
+
+.custom-paragraph {
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333; 
+}
+.custom-span {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333; 
+}
+
+.custom_footer_modal {
+    padding-bottom: 10px;
+    transform: translate(75%, 0)
+  }

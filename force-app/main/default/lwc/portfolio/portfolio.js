@@ -1,15 +1,17 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent} from 'lightning/platformShowToastEvent';
 import CreatePortfolio from 'c/createPortfolio';
+import BuyOrSellPopup  from 'c/buyOrSellPopup';
 import CreateTransactionPopup from 'c/createTransactionPopup';
 import createPortfolio from '@salesforce/apex/PortfolioController.createPortfolio';
 import createTransaction from '@salesforce/apex/PortfolioController.createTransaction';
 import getPortfolios from '@salesforce/apex/PortfolioController.getPortfolios';
 import getTransaction from '@salesforce/apex/PortfolioController.getTransaction';
+import deletePortfolio from '@salesforce/apex/PortfolioController.deletePortfolio';
 
 const actions = [
-    { label: 'Show details', name: 'show_details' },
-    { label: 'Delete', name: 'delete' },
+    { label: 'Buy', name: 'buy_token' },
+    { label: 'Sell', name: 'sell_token' },
 ];
 
 const COLUMNS = [
@@ -24,13 +26,13 @@ const COLUMNS = [
     },
 ];
 const PAGE_SIZE = 9;
+const SYMBOL_USD = '$';
 
 
 export default class Portfolio extends LightningElement {
     @track toggle = false;
-    @track isIconUp = false;
-    @track isIconDown = false;
-    @track isPaginator = false
+    @track isPaginator = false;
+    @track isMenuOpen = false;
 
     @track portfolios = [];
     @track selectedPortfolio = {};
@@ -40,6 +42,7 @@ export default class Portfolio extends LightningElement {
     @track averageProfitAndLoss = 0;
     
     priceList = {};
+    // isLoading = false;
     startingPageIndex = 1;
     endingPageIndex = 0;
     totalRecordCount;
@@ -49,42 +52,59 @@ export default class Portfolio extends LightningElement {
         console.log('call' + JSON.stringify(this.portfolios));
         this.loadPortfolios();
     }
+
     
     async loadPortfolios(toggle) {
         console.log('Loading data from server...');
-        try{
+          
             this.portfolios = await getPortfolios();
             console.log('id' + JSON.stringify(this.portfolios));
-            if(toggle) {
-                this.selectedPortfolio = this.portfolios[this.portfolios.length - 1];
+            
+            if(this.portfolios.length > 0) {  
+                if(toggle) {
+                    this.selectedPortfolio = this.portfolios[this.portfolios.length - 1];
+                    this.handleSelectPortfolio({currentTarget: {dataset: {id: this.selectedPortfolio.Id}}});
+            
+                }else{
+                    console.log('www')  
+                    this.selectedPortfolio = this.portfolios[0];
+                }
                 this.handleSelectPortfolio({currentTarget: {dataset: {id: this.selectedPortfolio.Id}}});
-         
             }else{
-                this.selectedPortfolio = this.portfolios[0];
-                this.handleSelectPortfolio({currentTarget: {dataset: {id: this.selectedPortfolio.Id}}});
-
+                this.addButtonAddPortfolio()
+                this.selectedPortfolio = {};
+                this.priceList = [];
+                this.dataTable = [];
+                this.isPaginator = false;
+                this.averageProfitAndLoss = 0;
             }
-            console.log( JSON.stringify(this.selectedPortfolio));
-        }catch (error){
-            console.error('Error loading data', error);
-        }
+        console.log( JSON.stringify(this.selectedPortfolio));
     }
+
+    
 
 
 
     async handleMyPortfolio() {
+        
         this.toggle = true;
         console.log('1work');
         await this.loadPortfolios(false);
-        // console.log('3work');
-        // this.selectedPortfolio = this.portfolios[0]
+        await this.addButtonAddPortfolio();
+        
+    }
 
-        //  if (!this.portfolios) {
-        //         this.selectedPortfolio = this.portfolios[0]; // Присвоєння першого об'єкта
-        // } else {
-        //         this.selectedPortfolio = {}; // Або null, якщо список порожній
-        // }
+    async addButtonAddPortfolio() {
+        console.log('add');
+        const buttonAddPortfolio = this.template.querySelector('.aside-button-add-portfolio'); 
+        console.log('add!'+ this.portfolios.length); ///when started  undefined
+        console.log('add@' + buttonAddPortfolio);
 
+        if (this.portfolios.length > 0 && buttonAddPortfolio) {
+            buttonAddPortfolio.classList.remove('slds-hide');
+        }else if(this.portfolios.length === 0) {
+            buttonAddPortfolio.classList.add('slds-hide');
+        }
     }
 
 
@@ -104,6 +124,7 @@ export default class Portfolio extends LightningElement {
                 this.showToast('Success', 'Portfolio Created', 'success');
                 
                 this.loadPortfolios(true);
+                
                 // this.selectedPortfolio = this.portfolios[0];
                 // this.handleSelectPortfolio({currentTarget: {dataset: {id: this.selectedPortfolio.Id}}});
             })
@@ -116,39 +137,83 @@ export default class Portfolio extends LightningElement {
         const portfolioId = event.currentTarget.dataset.id;
         console.log(portfolioId);
         
+        
+        
         this.selectedPortfolio = this.portfolios.find(portfolio => portfolio.Id == portfolioId);
         console.log( 'ff' + JSON.stringify(this.selectedPortfolio));
-        
         console.log(portfolioId);
+
+        if (this.selectedPortfolio) {
         getTransaction({accountId : portfolioId})
-            .then(transaction => {
-                //  testData = transaction;
-                console.log(JSON.stringify(transaction));
+        // this.isLoading = true;
+        .then(transaction => {
+            //  testData = transaction;
+            console.log(JSON.stringify(transaction));
                 
-                    
+                   
                 this.priceList = transaction.map(trans =>({
+                    id:trans.Id,
                     name: trans.Name,
-                    price:trans.Price_Per_Coin__c ,
-                    holdings: trans.TotalOpportunityQuantity, 
-                    average: '120.00', 
-                    profitAndLoss: '30099999999.00'
+                    price: SYMBOL_USD + trans.Price__c,
+                    holdings: trans.Quantity__c, 
+                    average: SYMBOL_USD + trans.Price_Per_Coin__c, 
+                    profitAndLoss: SYMBOL_USD + trans.Profit_and_Loss__c,
+                    totalProfitAndLoss: trans.Profit_and_Loss__c
                 }));   
                 
- 
-                this.totalRecordCount = this.priceList.length;
-                this.numberOfPages = Math.ceil(this.totalRecordCount / PAGE_SIZE);
-                console.log(this.totalRecordCount);
-                this.displayRecordPerPage(this.pageNumber);
-                console.log('pp'+JSON.stringify(this.priceList));
                 this.calculateAverageProfitAndLoss(this.priceList);
-        
+
+                    console.log(JSON.stringify(this.priceList));
+                this.totalRecordCount = this.priceList.length;
+                    console.log('total' +this.totalRecordCount);
+                this.numberOfPages = Math.ceil(this.totalRecordCount / PAGE_SIZE);
+                this.displayRecordPerPage(this.pageNumber);
+ 
+                this.addButtonAddPortfolio();
+                this.activeItem(portfolioId);
+
 
             })
             .catch(error =>{
-                this.showToast('Error', 'Transaction do not loaded', 'error');
+                this.showToast('Error', error, 'error');
 
             })
 
+            }else{
+                this.priceList = [];
+                this.dataTable = [];
+                this.isPaginator = false;
+                this.averageProfitAndLoss = 0;
+            }
+            
+
+    }
+
+
+    activeItem(portfolioId) {
+        const previouslySelected = this.template.querySelector('.is-selected');
+        const currentSelected = this.template.querySelector(`[data-id="${portfolioId}"]`);
+        
+        if (previouslySelected) {
+            previouslySelected.classList.remove('is-selected');
+            //fun toggle
+            previouslySelected.classList.add('is-active');
+
+            const previouslyButton = previouslySelected.querySelector('.portfolio_threedots_button');
+            if (previouslyButton) {
+                previouslyButton.classList.add('slds-hide');
+            }
+        }
+
+        if (currentSelected) {
+            currentSelected.classList.add('is-selected');
+            currentSelected.classList.remove('is-active');
+
+            const currentButton = currentSelected.querySelector('.portfolio_threedots_button');
+            if (currentButton) {
+                currentButton.classList.remove('slds-hide');
+            }
+        }
     }
 
     prevHandler(event) {
@@ -165,13 +230,27 @@ export default class Portfolio extends LightningElement {
         }
     }
 
+
     displayRecordPerPage(page) {
+        
+        console.log( 'page+++'+ page);
+        console.log( 'page_siZe'+ PAGE_SIZE);
+
+        if (page > this.numberOfPages){
+            page -= 1;
+            this.pageNumber = page;
+        }  
+
         this.startingPageIndex = (page - 1) * PAGE_SIZE;
         this.endingPageIndex = page * PAGE_SIZE;
+
+        console.log('sta'+this.startingPageIndex);
+        console.log('end'+this.endingPageIndex);
+        
         this.dataTable = this.priceList.slice(this.startingPageIndex, this.endingPageIndex);
 
         console.log( 'after++'+this.dataTable.length);
-        if(this.dataTable.length >= 9){
+        if(this.priceList.length >= 10){
             console.log( 'if'+this.dataTable.length);
             this.isPaginator = true;
         }else{
@@ -181,42 +260,7 @@ export default class Portfolio extends LightningElement {
         console.log('45 ++ '+JSON.stringify(this.dataTable));
     }
 
-    async handleNewTransaction() {
-        console.log('2' + this.selectedPortfolio.Id);
-    
-    
-        const resultTransactionPopup = await CreateTransactionPopup.open({
-            size: 'Small',
-            label: 'Transaction',
-            description: 'This is a modal popup'
-        });
-        
-        console.log(JSON.stringify(resultTransactionPopup));
-        if(resultTransactionPopup) {
-            // console.log('4' + JSON.stringify(this.priceList));
-
-            createTransaction({ 
-                accountId : this.selectedPortfolio.Id,
-                name : resultTransactionPopup.nameTransaction,
-                quantity : resultTransactionPopup.quantityTransaction,
-                pricePerCoin : resultTransactionPopup.pricePerCoinTransaction
-             })
-
-             .then(transaction => {
-                console.log( JSON.stringify(transaction));
-                this.showToast('Success', 'Transaction Created', 'success');
-                // this.handlePortfolio(transaction.accountId);
-                this.handleSelectPortfolio({currentTarget: {dataset: {id: this.selectedPortfolio.Id}}});
-
-
-            })
-            .catch(error =>{
-                this.showToast('Error', 'Transaction not created', 'error');
-
-            })
-
-        }
-    } 
+   
 
     async handleAddTransaction() {
         const resultTransactionPopup = await CreateTransactionPopup.open({
@@ -254,80 +298,160 @@ export default class Portfolio extends LightningElement {
     }
 
     calculateAverageProfitAndLoss(priceList) {
-        console.log('ddd' + priceList);
-        // if (priceList) {
-            let profitAndLossValues = priceList.map(item => parseFloat(item.profitAndLoss));    
+        
+            let profitAndLossValues = priceList.map(item => parseFloat(item.totalProfitAndLoss)); 
             this.averageProfitAndLoss = profitAndLossValues.reduce((total, value) => total + value, 0);
-            // this.averageProfitAndLoss = 0;
+            this.averageProfitAndLoss = parseFloat(this.averageProfitAndLoss.toFixed(2));
+            // this.averageProfitAndLoss = -666;
 
-            console.log('ave' + this.averageProfitAndLoss);
             this.addStyleToAverage(this.averageProfitAndLoss);      
-        // }else{
-            
-        //     // this.averageProfitAndLoss = 0;
-        //     console.log('else' + this.averageProfitAndLoss);
-        // }
+        
         
     }
 
     addStyleToAverage(averageProfitAndLoss) {
         
         const textElement = this.template.querySelector('.aside_context_average');
+        const iconDown = this.template.querySelector('.icon-down');
+        const iconUp = this.template.querySelector('.icon-up');
 
-        if(textElement) { 
+        if(textElement && iconDown && iconUp) { 
+                     
+            iconUp.classList.add('slds-hide');
+            iconDown.classList.add('slds-hide');
+            textElement.style.color = 'black';
+
             if(averageProfitAndLoss > 0) {
-                this.isIconUp = true;
-                this.isIconDown = false;
+                iconUp.classList.remove('slds-hide');
                 textElement.style.color = '#32e462';
             } else if(averageProfitAndLoss < 0) {
-                this.isIconUp = false;
-                this.isIconDown = true;
+                iconDown.classList.remove('slds-hide');
                 textElement.style.color = 'red';
-            } else{
-                this.isIconUp = false;
-                this.isIconDown = false;
-                textElement.style.color = 'black';
+            } 
+        }
+
+    }
+
+
+    handleThreedots() {
+        this.isMenuOpen = !this.isMenuOpen;
+    }
+
+    handleRename() {
+        console.log('Rename clicked');
+        this.closeMenu();
+    }
+
+    handleDelete() {
+
+        this.closeMenu();
+        if(this.selectedPortfolio.Id) {
+            console.log('isDelete');
+            deletePortfolio({portfolioId: this.selectedPortfolio.Id})
+            .then(result => {
+                this.showToast('Success', 'Portfolio Deleted', 'success');
+                // if(this.portfolios.length > 0) {
+                this.loadPortfolios(true);
                 
-            };
+
+            })
+            .catch(error =>{
+                this.showToast('Error', error , 'error');
+            })
+
+        }else{
+            this.showToast('Error', 'Invalid Portfolio ID', 'Error');
+        }
+
+       
+    }
+
+
+    closeMenu() {
+        this.isMenuOpen = false;
+    }
+
+
+
+//     Igor, [22/07/2024 3:02 PM]
+    handleActionsBlur(event) {
+        console.log(event);
+        console.log('ss1' + JSON.stringify(event.relatedTarget ));
+        console.log('ss' +JSON.stringify(event.target));
+        if (String(event.relatedTarget) === String(event.target)) {
+           
+
+            console.log('work');
+            this.setActionsPanelVisibility(false);
         }
     }
 
-    handleRename(){
-        
-        console.log('hell');
-        console.log('hell' + this.selectedPortfolio);
-    }
+// Igor, [22/07/2024 3:02 PM]
+// setActionsPanelVisibility(showPanel) {
+//         this.showActionsPanel = showPanel;
+//         const actionsPanel = this.template.querySelector(".actions-panel");
 
-    handleRemove(){
-        
-        console.log('hell');
-        console.log('hell' + this.selectedPortfolio);
-    }
+//         if (!actionsPanel) {
+//             return;
+//         }
+
+//         const escalateSubmenu = this.template.querySelector(".escalate-submenu");
+//         escalateSubmenu?.classList?.add("slds-hide");
+
+//         if (showPanel) {
+//             actionsPanel.classList.remove("slds-hide");
+//             actionsPanel.focus();
+//         } else {
+//             actionsPanel.classList.add("slds-hide");
+//         }
+//     }
+    // }
 
     handleRowAction(event) {
         const actionName = event.detail.action.name;
-        const row = event.detail.row;
+        const token = event.detail.row;
+
         switch (actionName) {
-            case 'show_details':
-                this.showDetails(row);
+            case 'buy_token':
+                const buyingData = this.createTransactionData(token, 'Buy', 'success');
+                this.handleTokenTransaction(buyingData);
+
                 break;
-            case 'delete':
-                this.deleteRow(row);
+            case 'sell_token':
+                const sellingData = this.createTransactionData(token, 'Sell', 'destructive');
+                this.handleTokenTransaction(sellingData);
+
                 break;
             default:
         }
     }
 
-    showDetails(row) {
-        // Implement show details logic here
-        console.log('Showing details for:', row);
+    createTransactionData(token, type, variant) {
+        return {
+            id: token.id,
+            name: token.name,
+            type: type,
+            variant: variant,
+            price: token.price.replace(/\$/g, ''),
+            holdings: token.holdings,
+            average: token.average.replace(/\$/g, ''),
+            profitAndLoss: token.profitAndLoss.replace(/\$/g, ''),
+            totalProfitAndLoss: token.totalProfitAndLoss
+        };
     }
 
-    deleteRow(row) {
-        // Implement delete logic here
-        console.log('Deleting row:', row);
-        this.data = this.data.filter(item => item.name !== row.name);
+    handleTokenTransaction(transaction) {
+        console.log(JSON.stringify(transaction));
+        BuyOrSellPopup.open({transaction: transaction})
+        .then(result => {
+            this.handleSelectPortfolio({currentTarget: {dataset: {id: this.selectedPortfolio.Id}}});
+            console.log(' modal result:', JSON.stringify(result));
+        }).catch(error => {
+            console.error(' modal error:', error);
+        });
+
     }
+
 
     showToast(title, message, variant) {
         const evt = new ShowToastEvent({
@@ -338,7 +462,5 @@ export default class Portfolio extends LightningElement {
         this.dispatchEvent(evt);
     }  
 
-
-    
 
 }
