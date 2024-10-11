@@ -1,0 +1,36 @@
+.container_custom_modal {
+  transform: translate(-50%, 0%);
+  position: relative;
+  left: 50%;
+  font-size: 16px;
+  margin: 25px;
+  width: 400px;
+  height: 400px;
+}
+
+.custom_body_modal{
+    padding: 0 16px 16px 16px;
+}
+
+.custom_footer_modal {
+    padding-bottom: 10px;
+    transform: translate(33%, 0)
+}
+
+.custom-button{
+  background-color: #000; 
+  color: #fff; 
+  border: none; 
+  border-radius: 5px; 
+  padding: 10px 20px; 
+  cursor: pointer; 
+  transition: background-color 0.3s; 
+}
+.custom-button:hover{
+  background-color: #333; 
+  transition: background-color 0.3s;
+}
+  
+.custom-button:active{
+  background-color: rgba(196, 89, 252, 1);
+}  

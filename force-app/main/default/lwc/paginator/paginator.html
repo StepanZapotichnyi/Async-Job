@@ -1,15 +1,33 @@
 <template>
     <lightning-layout>
         <lightning-layout-item>
-            <lightning-button-icon label="" icon-name="utility:left" onclick={handelPrevious}></lightning-button-icon>
+            <button
+                class="custom-button  "
+                type="button"
+                aria-hidden="true"
+                onclick={handelPrevious}>
+                    <svg class=" slds-button__icon_large">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#chevronleft"></use>
+                    </svg>
+                <span class="slds-assistive-text">Previous</span>
+            </button>
         </lightning-layout-item>
         <lightning-layout-item flexibility="grow">
             <div class="slds-p-top_xx-small slds-m-horizontal_x-small">
-                <p class="">{pageNumber} of {numberOfPages}</p>
+                <p class="custom-text">{pageNumber} ... {numberOfPages}</p>
             </div>
         </lightning-layout-item>
         <lightning-layout-item>
-            <lightning-button-icon label="" icon-name="utility:right" onclick={handleNext}></lightning-button-icon>
+            <button
+            class="custom-button"
+            type="button"
+            aria-hidden="true"
+            onclick={handleNext}>
+                <svg class=" slds-button__icon_large">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#chevronright"></use>
+                </svg>
+            <span class="slds-assistive-text">Next</span>
+        </button>
         </lightning-layout-item>
     </lightning-layout>
 </template>

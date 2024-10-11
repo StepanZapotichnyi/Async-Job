@@ -1,0 +1,22 @@
+<template>
+    <div class="container_custom_modal">
+            <lightning-card variant="Narrow">
+                <h1 slot="title" class="custom_body_modal">Select a time range</h1>
+                <div class="custom_body_modal">
+                    <div class="slds-m-around_medium">
+                        <lightning-input type="date" label="Date Starting" onchange={handleChangeDateStart} value={today}></lightning-input>
+                    </div>
+                    <div class="slds-p-top_xx-large">
+                        <p class="slds-text-title_caps">To</p>
+                    </div>
+                    <div class="slds-m-around_medium">
+                        <lightning-input type="date"  label="Date Ending"  onchange={handleChangeDateEnd} value={lastThirtyDays}></lightning-input>
+                    </div>
+                </div> 
+                <div class="custom_footer_modal ">
+                        <button class="custom-button" onclick={handleContinue}>Continue</button>
+                </div>  
+            </lightning-card>
+    </div>
+    
+</template>

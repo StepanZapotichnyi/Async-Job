@@ -20,7 +20,6 @@
 .side_header_container{
     border-bottom: 1px solid black;
 
-
 }
 
 .side_bar_title {
@@ -91,8 +90,7 @@
 .custom_button_threedots{
     border:none;
     background-color: transparent; 
- 
-   
+  
 }   
 
 .portfolio_threedots_button.hidden{

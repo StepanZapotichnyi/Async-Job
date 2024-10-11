@@ -18,8 +18,10 @@ const COLUMNS = [
     {label: 'Name', fieldName : 'name'},
     {label: 'Price', fieldName : 'price'},
     {label: 'Holdings', fieldName : 'holdings'},
+    {label: 'Spend', fieldName : 'spending'},
     {label: 'Avg. Buy Price', fieldName : 'average'},
     {label: 'Profit/Loss', fieldName : 'profitAndLoss'},
+    
     {
         type: 'action',
         typeAttributes: { rowActions: actions },
@@ -380,9 +382,8 @@ export default class Portfolio extends LightningElement {
         console.log('ss' +JSON.stringify(event.target));
         if (String(event.relatedTarget) === String(event.target)) {
            
-
+            
             console.log('work');
-            this.setActionsPanelVisibility(false);
         }
     }
 

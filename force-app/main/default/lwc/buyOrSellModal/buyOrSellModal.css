@@ -7,13 +7,11 @@
     width: 400px;
     height: 400px;
   
-  }
-  
-
+}
 
 .custom_body_modal{
     padding: 0 16px 16px 16px;
-  }
+}
 
 .custom-paragraph {
     margin-bottom: 8px;
@@ -31,4 +29,4 @@
 .custom_footer_modal {
     padding-bottom: 10px;
     transform: translate(75%, 0)
-  }
+}

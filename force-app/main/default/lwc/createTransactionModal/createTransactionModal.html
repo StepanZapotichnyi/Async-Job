@@ -3,20 +3,19 @@
             <lightning-card variant="Narrow" title="New Transaction" icon-name="standard:notes">
                 <div class="custom_body_modal ">
                     <div class="slds-m-around_medium ">
-                        <lightning-input class="" type="text" label="Name" onchange={handleNameChange}></lightning-input>
+                        <lightning-input class="" type="text" label="Token Symbol" onchange={handleTokenSymbolChange}></lightning-input>
                     </div>
                     <div class="slds-m-around_medium ">
                         <lightning-input type="number"  label="Quantity"  onchange={handleQuantityChange}  ></lightning-input>
                     </div>
                     <div class="slds-m-around_medium ">
-                        <lightning-input type="number"   label="Price Per Coin" onchange={handlePricePerCoinChange}></lightning-input>
+                        <lightning-input type="number"   label="Amount" onchange={handleAmountChange}></lightning-input>
                     </div>
-                </div>    
-                <!-- <lightning-modal-footer> --> 
+
+                </div> 
                 <div class="custom_footer_modal ">
-                        <lightning-button class="" label="Add Transaction" icon-name="utility:add" variant="Brand" onclick={handleAddTransaction}></lightning-button>
+                        <button class="custom-button" onclick={handleAddTransaction}>Add Transaction</button>
                 </div>  
-                <!-- </lightning-modal-footer>  -->
             </lightning-card>
     </div>
    

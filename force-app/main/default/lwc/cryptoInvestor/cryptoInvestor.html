@@ -1,0 +1,266 @@
+<template>
+    <lightning-card>
+        <div class="header-card slds-m-horizontal_medium slds-m-bottom_small"> 
+            <div class="header-card__wrapper slds-p-around_large">
+                <div class="header-card__inner slds-p-left_small">
+                    <div class="header-card__container container-content">
+                        <div class="container-content__text slds-p-around_medium">
+                            <p>Amount Investments:<span class="slds-m-left_x-small">{amountInvestments}</span></p>
+                        </div>
+                        <div class="container-content__text slds-p-bottom_medium slds-var-p-horizontal_medium">
+                            <p>Currency Balance:<span class="slds-m-left_x-small">{currencyBalance}</span></p>
+                        </div>
+                        <div class="container-content__text slds-var-p-horizontal_medium">
+                            <p>Today PNL<span class="slds-m-left_x-small">{todayPnl}</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section slds-m-horizontal_medium">
+            <lightning-tabset class="section__tabset section-tab" variant="scoped">
+               
+                <template lwc:if={isLoading}>
+                    <div class="spinner">
+                        <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                    </div>
+                </template>
+                
+                <lightning-tab class="section-tab__portfolio portfolio-container" label="Portfolio">
+                    <div class="portfolio-container__content slds-grid slds-wrap">
+                        <div class="portfolio-container__sidebar sidebar slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12">
+                            <div class="sidebar__header">
+                                <h2 class="sidebar-header__title slds-var-p-around_x-small slds-col">My Portfolio</h2>
+                                <div class=" button-new slds-hide slds-var-p-around_xx-small">
+                                    <button
+                                        class="custom-button-add__portfolio  slds-p-top_small slds-p-bottom_small slds-p-right_small "
+                                        type="button"
+                                        aria-hidden="true"
+                                        onclick={handleCreatePortfolio}>
+                                            <svg class=" slds-button__icon_large   custom_button_active ">
+                                              
+                                                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#add"></use>
+                                            </svg>
+                                        <span class="slds-assistive-text">Add Portfolio</span>
+                                    </button>
+                                </div>  
+                            </div>
+                          
+                            <template lwc:if={portfolios.length}>
+                                <lightning-layout class="slds-scrollable_y slds-grid_vertical sidebar__items"> 
+                                    <template for:each={portfolios} for:item="portfolio">
+                                        <lightning-layout-item key={portfolio.Id} class="sidebar__item is-active"  onclick={handleSelectPortfolio} data-id={portfolio.Id}>
+                                            <div class="slds-grid">
+                                                <div class="sidebar-item__container slds-truncate slds-col slds-size_1-of-1 slds-small-size_6-of-12 slds-large-size_10-of-12">
+                                                    <span class="sidebar-item__title slds-truncate">{portfolio.Name}</span> 
+                                                </div>
+                                                <div class="sidebar-item_button-threedots  slds-col slds-size_1-of-1 slds-small-size_6-of-12 slds-large-size_2-of-12  slds-hide">
+                                                    <button
+                                                        class="custom_button_threedots  slds-p-top_small slds-p-bottom_small slds-p-right_small "
+                                                        type="button"
+                                                        aria-hidden="true"
+                                                        onclick={handleThreedots}
+                                                        onblur={handleActionsBlur}>
+                                                            <svg class=" slds-button__icon_large   custom_button_active ">
+                                                                <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#threedots"></use>
+                                                            </svg>
+                                                        <span class="slds-assistive-text">Remove and Rename</span>
+                                                    </button>
+                                                    <div class=" custom_threedots_menu-buttons slds-dropdown_right" if:true={isMenuOpen}>
+                                                        <div class="slds-dropdown   slds-dropdown_right slds-dropdown_xx-small  ">
+                                                              <ul class="slds-dropdown__list" role="menu">
+                                                                <li class="slds-dropdown__item" >
+                                                                  <a role="menuitem" onclick={handleRename} >
+                                                                    <span class="slds-truncate" title="Rename">
+                                                                      <svg class="slds-icon slds-icon_x-small slds-icon-text-default slds-m-right_x-small" >
+                                                                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#record_update"></use>
+                                                                      </svg>Rename</span>
+                                                                  </a>
+                                                                </li>
+                                                                <li class="slds-dropdown__item"  >
+                                                                  <a  role="menuitem" onclick={handleDelete}>
+                                                                    <span class="slds-truncate" title="Delete">
+                                                                      <svg class="slds-icon slds-icon_x-small slds-icon-text-default slds-m-right_x-small" >
+                                                                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#delete"></use>
+                                                                      </svg>Delete</span>
+                                                                  </a>
+                                                                </li>
+                                                              </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </lightning-layout-item>
+                                    </template>
+                                </lightning-layout>
+                            </template>
+
+                            <template lwc:else>
+                                <div class="sidebar__button-new-portfolio">
+                                    <div class="button-new-portfolio__container"> 
+                                         <button class="custom-button-new_portfolio  slds-var-p-around_x-small"  onclick={handleCreatePortfolio}>New Portfolio</button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="portfolio-container__body slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_9-of-12">
+                            <div class="portfolio-container__header">
+                                <template lwc:if={selectedPortfolio.Name}>
+                                    <div class="portfolio-header__name slds-truncate">
+                                        <div class="slds-var-p-around_x-small slds-truncate">
+                                            <p class="slds-truncate">{selectedPortfolio.Name}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="portfolio-header__profit">
+                                        <div class="slds-var-p-around_x-small">
+                                            <div class="profit-indicator ">
+                                                <p class="profit-label">Profit:</p>
+                                                <div class="container_indicator_icon">
+                                                    <div class="icon-up slds-hide">
+                                                    <span class="custom-icon slds-icon_container slds-icon-utility-up "  title="Average UP or Down">
+                                                        <svg class=" slds-icon slds-icon_x-small slds-m-bottom_small" aria-hidden="true">
+                                                            <use class="slds-icon" style= "fill:#0eff00" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#up"></use>
+                                                        </svg>
+                                                        <span class="slds-assistive-text">Indicator UP or Down</span>    
+                                                    </span>
+                                                    </div>
+                                                    <div class="icon-down slds-hide">
+                                                    <span class="custom-icon slds-icon_container slds-icon-utility-down "  title="Average UP or Down">
+                                                        <svg class=" slds-icon slds-icon_x-small slds-m-top_x-small" aria-hidden="true">
+                                                            <use class="slds-icon" style= "fill:red" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#down"></use>
+                                                        </svg>
+                                                        <span class="slds-assistive-text">Indicator UP or Down</span>    
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                                <p class="profit-indicator__value ">${averageProfitAndLoss}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template lwc:else>
+                                    <div class="slds-var-p-around_x-small">
+                                        <p>Need to create a portfolio</p>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="portfolio-container__table table ">
+                                <div class="table__content">
+
+                                    <div class="table__empty-state "> 
+                                        <p class="slds-text-align_center">While there is nothing here, create a portfolio to get started</p>
+                                    </div>
+
+                                    <div class="data-table-container slds-hide">
+                                        <template lwc:if={dataTable.length}>
+                                            <lightning-datatable 
+                                                key-field="Id" 
+                                                data={dataTable} 
+                                                columns={columnsToPortfolio} 
+                                                hide-checkbox-column = "true" 
+                                                show-row-number-column="true"
+                                                onrowaction={handleRowAction}>
+                                            </lightning-datatable>
+
+                                            <div class="footer-datatable__portfolio">
+                                                <div class="slds-var-p-around_x-small slds-m-top_xx-small">
+                                                    <button class="custom-button-new__transaction"  onclick={handleCreateTransaction}>Add Transaction</button>
+                                                </div>
+                                                <template lwc:if={isPaginatorToPortfolioTab}>
+                                                    <div class="slds-p-right_small">
+                                                        <c-paginator onprevious={prevHandlerToPortfolioTab} page-number={pageNumberToPortfolioTab} number-of-pages={numberOfPagesToPortfolioTab} onnext={nextHandlerToPortfolioTab}> </c-paginator>
+                                                    </div>
+                                                </template> 
+                                             </div>
+                                        </template>
+                                        
+                                        <template lwc:else>
+                                            <div class="table__empty-state"> 
+                                                <button class="custom-button-new__transaction"  onclick={handleCreateTransaction}>New Transaction</button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </lightning-tab>
+                <lightning-tab class="section-tab__history" label="History">
+                    <div class="history-container">
+                        <div class="history-header">
+                            <div class="history-header_container">
+                                <h2 class="history-header__title slds-var-p-around_x-small slds-col">History Transaction</h2>
+                            </div>    
+                        </div>
+                        <div class="history__body slds-p-around_medium">
+
+                            <div class="container_custom-select slds-p-left_xx-large">
+                                <p class="text_custom-form">Choose time:</p>
+                                <select data-id="time-select" onchange={handleChangeTime}>
+                                    <template for:each={transactionTimeOptions} for:item="item">
+                                        <option key={item.key} value={item.key}>{item.value}</option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <div class="container_custom-input slds-p-left_xx-large">
+                                <p class="text_custom-form">Token Symbol</p>
+                                <input class="custom-input_history" type="text" placeholder="BTC" data-id="symbol-input" onchange={handleSearchSymbol}>
+                            </div>
+
+                            <div class="container_custom-select slds-p-left_xx-large">
+                                <p class="text_custom-form">Choose type:</p>
+                                <select data-id="type-select" onchange ={handleChangeType}>
+                                    <template for:each={transactionTypeOptions} for:item="item">
+                                        <option key={item.key} value={item.key}>{item.value}</option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div class="container_custom-button slds-p-left_xx-large slds-p-top_medium">
+                                <button class="custom-button__reset" onclick={handleReset}>Reset</button>
+                            </div>    
+                        </div>
+
+                        <div class="data-table-container">
+                            <template lwc:if={transactions.length}>
+                                <div class="slds-p-bottom_medium">
+                                    <lightning-datatable 
+                                        key-field="Id" 
+                                        data={dataTableToHistoryTab} 
+                                        columns={columnsToHistoryTransactions} 
+                                        hide-checkbox-column = "true" 
+                                        show-row-number-column="true"
+                                        onrowaction={handleRowAction}>
+                                    </lightning-datatable>
+                                </div>
+                                <div class="empty-datatable slds-text-align_center slds-hide">
+                                    <p class="empty-datatable-history__message">Nothing was found for your parameters. Please make sure you have entered the date, symbol and type correctly!</p>
+                                </div>
+                                <div class="footer-datatable__history">
+                                    <template lwc:if={isPaginatorToHistoryTransactions}>
+                                        <div class=" slds-var-p-horizontal_medium slds-p-bottom_medium">
+                                            <c-paginator onprevious={prevHandlerToHistoryTab} page-number={pageNumberToHistoryTab} number-of-pages={numberOfPagesToHistoryTab} onnext={nextHandlerToHistoryTab}> </c-paginator>
+                                        </div>
+                                    </template> 
+                                 </div>
+                            </template>
+                            <template lwc:else>
+                                <div class="slds-text-align_center">
+                                    <p class="empty-datatable-history__message">No data to display. Create a new transaction or add items to your portfolio.</p>
+                                </div>
+
+                            </template>
+                        </div>
+                        
+
+                    </div>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+</template>

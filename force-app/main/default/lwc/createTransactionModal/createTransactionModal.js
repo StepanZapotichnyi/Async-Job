@@ -1,35 +1,29 @@
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import checkTokenPresenceSymbol from '@salesforce/apex/UtilityToPortfolio.checkTokenPresenceSymbol';
+import verifyTokenSymbol from '@salesforce/apex/UtilityToPortfolio.verifyTokenSymbol';
 import  LightningModal  from 'lightning/modal';
 
 
-export default class CreateTransactionPopup extends LightningModal {
+export default class CreateTransactionModal extends LightningModal {
     
-    nameTransaction = '';
+    symbolTransaction = '';
     quantityTransaction = 0;
-    pricePerCoinTransaction = 0;
-
-
-
+    amountTransaction = 0;
     
-    handleNameChange(event) {
-        this.nameTransaction = event.target.value;
+    handleTokenSymbolChange(event) {
+        this.symbolTransaction =  event.target.value;
     }
 
     handleQuantityChange(event) {
-        this.quantityTransaction = event.target.value;
+        this.quantityTransaction =  parseFloat(event.target.value);
     }
-    handlePricePerCoinChange(event) {
-        this.pricePerCoinTransaction = event.target.value;
+    handleAmountChange(event) {
+        this.amountTransaction = event.target.value;
     }
     
     
     handleAddTransaction() {
-        console.log('work' + this.nameTransaction);
         
-        if(!this.nameTransaction) {
-            console.log('work1' + this.nameTransaction);
-            
+        if(!this.symbolTransaction) {
             this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error',
@@ -39,17 +33,15 @@ export default class CreateTransactionPopup extends LightningModal {
             );
             
         }else {
-            checkTokenPresenceSymbol({ symbol: this.nameTransaction.toUpperCase() })
+            verifyTokenSymbol({ symbol: this.symbolTransaction.toUpperCase() })
             .then(response => {
-                console.log(response);
                 this.close({
-                    nameTransaction: response,
+                    symbolTransaction: response,
                     quantityTransaction: this.quantityTransaction,
-                    pricePerCoinTransaction: this.pricePerCoinTransaction
+                    amountTransaction: this.amountTransaction
                 });
             })
             .catch(error => {
-                console.error('error:', error);
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Error',

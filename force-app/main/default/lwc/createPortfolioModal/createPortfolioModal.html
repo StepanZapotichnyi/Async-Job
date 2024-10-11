@@ -1,0 +1,16 @@
+<template>
+    <div class="container_custom_modal"> 
+         <lightning-card variant="Narrow" title="New Portfolio" icon-name="standard:notes">
+             <lightning-modal-body>
+                 <div class="slds-m-around_medium">
+                     <lightning-input type="text" label="Label" onchange={handleLabelChange}></lightning-input>
+                 </div>
+             </lightning-modal-body> 
+             <lightning-modal-footer>
+                 <button class="custom-button" onclick={handleSave}>Save</button>
+             </lightning-modal-footer> 
+         </lightning-card>
+     </div>
+ 
+ </template>
+ 
